@@ -1,0 +1,7 @@
+fullnameOverride: mongodb-gcs-backup
+
+concurrencyPolicy: Forbid
+failedJobsHistoryLimit: 1
+restartPolicy: OnFailure
+schedule: "* * * * *"
+successfulJobsHistoryLimit: 3

@@ -1,0 +1,38 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: {{ template "mongodb-gcs-backup.fullname" . }}
+  labels:
+    app: {{ template "mongodb-gcs-backup.name" . }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  concurrencyPolicy: {{ .Values.concurrencyPolicy }}
+  failedJobsHistoryLimit: {{ .Values.failedJobsHistoryLimit }}
+  schedule: {{ .Values.schedule }}
+  successfulJobsHistoryLimit: {{ .Values.successfulJobsHistoryLimit }}
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          name: {{ template "mongodb-gcs-backup.fullname" . }}
+          labels:
+            app: {{ .Release.Name }}
+            cron: {{ template "mongodb-gcs-backup.name" . }}
+        spec:
+          containers:
+          - name: {{ .Chart.Name }}
+            image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+            imagePullPolicy: {{ .Values.image.pullPolicy }}
+            env:
+{{ toYaml .Values.env | indent 12 }}
+            volumeMounts:
+              - name: gcp-credentials
+                mountPath: /secrets/gcp
+                readOnly: true
+          restartPolicy: {{ .Values.restartPolicy }}
+          volumes:
+            - name: gcp-credentials
+              secret:
+                secretName: {{ .Values.secretName }}
