@@ -1,9 +1,15 @@
-fullnameOverride: mongodb-gcs-backup
-
 image:
   repository: zoov/mongodb-gcs-backup
   tag: latest
   pullPolicy: IfNotPresent
+
+resources: {}
+#  limits:
+#    cpu: 100m
+#    memory: 128Mi
+#  requests:
+#    cpu: 100m
+#    memory: 128Mi
 
 concurrencyPolicy: Forbid
 failedJobsHistoryLimit: 1

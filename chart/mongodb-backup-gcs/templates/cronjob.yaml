@@ -31,6 +31,8 @@ spec:
               - name: gcp-credentials
                 mountPath: /secrets/gcp
                 readOnly: true
+            resources:
+  {{ toYaml .Values.resources | indent 12 }}
           restartPolicy: {{ .Values.restartPolicy }}
           volumes:
             - name: gcp-credentials
