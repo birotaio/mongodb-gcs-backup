@@ -24,4 +24,4 @@ WORKDIR /mongodb-gcs-backup
 
 RUN chmod +x /mongodb-gcs-backup/backup.sh
 
-CMD ["/mongodb-gcs-backup/backup.sh"]
+ENTRYPOINT ["/mongodb-gcs-backup/backup.sh"]
