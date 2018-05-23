@@ -7,10 +7,9 @@ We provide a kubernetes support thanks to the helm chart located in the `chart` 
 
 ### Docker image
 
-There's no public image provided so you have to build your own one:
+You can pull the public image from Docker Hub:
 
-    docker build -t latest . && \
-    docker push mongodb-gcs-backup:latest
+    docker pull zoov/mongodb-gcs-backup:latest
 
 
 ### Configuration
