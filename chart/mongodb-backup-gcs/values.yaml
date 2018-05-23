@@ -1,5 +1,10 @@
 fullnameOverride: mongodb-gcs-backup
 
+image:
+  repository: zoov/mongodb-gcs-backup
+  tag: latest
+  pullPolicy: IfNotPresent
+
 concurrencyPolicy: Forbid
 failedJobsHistoryLimit: 1
 restartPolicy: OnFailure
