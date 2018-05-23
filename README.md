@@ -14,7 +14,7 @@ You can pull the public image from Docker Hub:
 
 ### Configuration
 
-The following table lists the configurable parameters you can set up w.
+The following table lists the configurable parameters you can set up.
 
 Environment Variable | Required | Default | Description
 ---------------------|----------|---------|-------------
@@ -99,4 +99,4 @@ To use the resulting JSON key file within Kubernetes you can create a secret fro
       kubectl create secret generic mongodb-gcs-backup \
       --from-file=credentials.json=/path/to/your/key.json
 
-Then you will need to specify this secret name via the `--set secretName=<your_secret_name>` argument to the `helm install` command or by specifying it directly in your `values.yaml` file (by default, the secret name is set to `mongodb-gcs-backup`). The key file will be mounted mounted by default under `/secrets/gcp/credentials.json` and the `GCS_KEY_FILE_PATH` variable should point to it.
+Then you will need to specify this secret name via the `--set secretName=<your_secret_name>` argument to the `helm install` command or by specifying it directly in your `values.yaml` file (by default, the secret name is set to `mongodb-gcs-backup`). The key file will be mounted by default under `/secrets/gcp/credentials.json` and the `GCS_KEY_FILE_PATH` variable should point to it.
