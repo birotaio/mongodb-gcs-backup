@@ -51,6 +51,10 @@ backup() {
 }
 
 upload_to_gcs() {
+  if [[ ! "$GCS_BUCKET" =~ gs://* ]]; then
+    GCS_BUCKET="gs://${GCS_BUCKET}"
+  fi
+
   if [[ $GCS_KEY_FILE_PATH != "" ]]
   then
 cat <<EOF > $BOTO_CONFIG_PATH

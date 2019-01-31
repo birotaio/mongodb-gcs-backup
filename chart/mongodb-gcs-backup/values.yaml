@@ -11,6 +11,10 @@ resources: {}
 #    cpu: 100m
 #    memory: 128Mi
 
+env: {}
+# - name: GCS_BUCKET
+#   value: "gs://bucket-name/path"
+
 concurrencyPolicy: Forbid
 failedJobsHistoryLimit: 1
 restartPolicy: OnFailure
