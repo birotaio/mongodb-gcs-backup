@@ -16,6 +16,7 @@ MONGODB_DB=${MONGODB_DB:-}
 MONGODB_USER=${MONGODB_USER:-}
 MONGODB_PASSWORD=${MONGODB_PASSWORD:-}
 MONGODB_OPLOG=${MONGODB_OPLOG:-}
+RETENTION_COUNT=${RETENTION_COUNT:-}
 SLACK_ALERTS=${SLACK_ALERTS:-}
 SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL:-}
 SLACK_CHANNEL=${SLACK_CHANNEL:-}
@@ -30,7 +31,7 @@ backup() {
   cmd_auth_part=""
   if [[ ! -z $MONGODB_USER ]] && [[ ! -z $MONGODB_PASSWORD ]]
   then
-    cmd_auth_part="--username=\"$MONGODB_USER\" --password=\"$MONGODB_PASSWORD\""
+    cmd_auth_part="--username=\"$MONGODB_USER\" --password=\"$MONGODB_PASSWORD\" --authenticationDatabase=admin"
   fi
 
   cmd_db_part=""
@@ -99,6 +100,12 @@ err() {
 
 cleanup() {
   rm $BACKUP_DIR/$archive_name
+  NUMBER="$(gsutil ls $GCS_BUCKET/ | wc -l)"
+  RETENTION=$((RETENTION_COUNT+1))
+  if [[ ${NUMBER} -gt ${RETENTION} ]]
+  then
+  gsutil ls -l $GCS_BUCKET/ | sort -r -k 2 | tail  +$RETENTION | awk '{print $3}' | gsutil rm -I
+  fi
 }
 
 trap err ERR
