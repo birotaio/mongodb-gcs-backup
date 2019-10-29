@@ -28,6 +28,7 @@ Environment Variable | Required | Default | Description
 `MONGODB_USER` | No |  | The MongoDB user if any.
 `MONGODB_PASSWORD` | No |  | The MongoDB password if any.
 `MONGODB_OPLOG` | No |  | `true` if you want to perform a `mongodump` with the `--oplog` flag, false otherwise.
+`RETENTION_COUNT` | No |  | if you want to define number of dumps kept in bucket(ex. "10" will keep latest 10).
 `SLACK_ALERTS` | No |  | `true` if you want to send Slack alerts in case of failure.
 `SLACK_WEBHOOK_URL` | No |  | The Incoming WebHook URL to use to send the alerts.
 `SLACK_CHANNEL` | No |  | The channel to send Slack messages to.
