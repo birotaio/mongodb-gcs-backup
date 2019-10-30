@@ -99,12 +99,16 @@ err() {
 }
 
 cleanup() {
+  echo "cleanup started"
   rm $BACKUP_DIR/$archive_name
-  NUMBER="$(gsutil ls $GCS_BUCKET/ | wc -l)"
-  RETENTION=$((RETENTION_COUNT+1))
-  if [[ ${NUMBER} -gt ${RETENTION} ]]
+  if [[ $RETENTION_COUNT != "" ]]
   then
-  gsutil ls -l $GCS_BUCKET/ | sort -r -k 2 | tail  +$RETENTION | awk '{print $3}' | gsutil rm -I
+    NUMBER="$(gsutil ls $GCS_BUCKET/ | wc -l)"
+    RETENTION=$((RETENTION_COUNT+1))
+    if [[ ${NUMBER} -gt ${RETENTION} ]]
+    then
+    gsutil ls -l $GCS_BUCKET/ | sort -r -k 2 | tail  +$RETENTION | awk '{print $3}' | gsutil rm -I
+    fi
   fi
 }
 
