@@ -48,7 +48,7 @@ backup() {
 
   cmd="mongodump --host=\"$MONGODB_HOST\" --port=\"$MONGODB_PORT\" $cmd_auth_part $cmd_db_part $cmd_oplog_part --gzip --archive=$BACKUP_DIR/$archive_name"
   echo "starting to backup MongoDB host=$MONGODB_HOST port=$MONGODB_PORT"
-  eval "$cmd"
+  eval "$cmd" 2>&1
 }
 
 upload_to_gcs() {
@@ -67,7 +67,7 @@ default_api_version = 2
 EOF
   fi
   echo "uploading backup archive to GCS bucket=$GCS_BUCKET"
-  gsutil cp $BACKUP_DIR/$archive_name $GCS_BUCKET
+  gsutil cp $BACKUP_DIR/$archive_name $GCS_BUCKET 2>&1
 }
 
 send_slack_message() {
