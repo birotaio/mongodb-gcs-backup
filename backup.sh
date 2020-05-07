@@ -64,8 +64,15 @@ backup() {
       cmd_db_part=$DB_NAME
     fi
 
-    echo "mysqldump -h $DB_HOST -P $DB_PORT -usessl=false -u $DB_USER -p$DB_PASSWORD $cmd_db_part | gzip > $BACKUP_DIR/$archive_name"
-    cmd="mysqldump -h $DB_HOST -P $DB_PORT -usessl=false -u $DB_USER -p$DB_PASSWORD $cmd_db_part | gzip > $BACKUP_DIR/$archive_name"
+
+    cmd_auth_part=""
+    if [[ ! -z $DB_USER ]] && [[ ! -z $DB_PASSWORD ]]
+    then
+      cmd_auth_part="-u $DB_USER -p$DB_PASSWORD"
+    fi
+
+    echo "mysqldump -h $DB_HOST -P $DB_PORT -usessl=false $cmd_auth_part $cmd_db_part | gzip > $BACKUP_DIR/$archive_name"
+    cmd="mysqldump -h $DB_HOST -P $DB_PORT -usessl=false $cmd_auth_part $cmd_db_part | gzip > $BACKUP_DIR/$archive_name"
   fi
 
   if [[ $DB_TYPE == "POSTGRESQL" ]]
@@ -146,8 +153,8 @@ cleanup() {
   fi
 }
 
-#trap err ERR
+trap err ERR
 backup
-#upload_to_gcs
-#cleanup
+upload_to_gcs
+cleanup
 echo "backup done!"
