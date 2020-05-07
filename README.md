@@ -18,16 +18,17 @@ The following table lists the configurable parameters you can set up.
 
 Environment Variable | Required | Default | Description
 ---------------------|----------|---------|-------------
+`DB_TYPE` | Yes | `/tmp` | Which db is being backup. (MONGODB, POSTGRESQL, MYSQL)
 `BACKUP_DIR` | No | `/tmp` | The path where the `mongodump` result will be temporarily stored.
 `BOTO_CONFIG_PATH` | No | `/root/.boto` | The path where `gsutil` will search for the boto configuration file.
 `GCS_BUCKET` | Yes |  | The bucket you want to upload the backup archive to.
 `GCS_KEY_FILE_PATH` | Yes |  | The location where the GCS serviceaccount key file will be mounted.
-`MONGODB_HOST` | No | `localhost` | The MongoDB server host.
-`MONGODB_PORT` | No | `27017` | The MongoDB port.
-`MONGODB_DB` | No |  | The database to backup. By default, a backup of all the databases will be performed.
-`MONGODB_USER` | No |  | The MongoDB user if any.
-`MONGODB_PASSWORD` | No |  | The MongoDB password if any.
-`MONGODB_OPLOG` | No |  | `true` if you want to perform a `mongodump` with the `--oplog` flag, false otherwise.
+`DB_HOST` | No | `localhost` | The MongoDB server host.
+`DB_PORT` | No | `27017` | The MongoDB port.
+`DB_DB` | No |  | The database to backup. By default, a backup of all the databases will be performed.
+`DB_USER` | No |  | The MongoDB user if any.
+`DB_PASSWORD` | No |  | The MongoDB password if any.
+`DB_OPLOG` | No |  | `true` if you want to perform a `mongodump` with the `--oplog` flag, false otherwise.
 `RETENTION_COUNT` | No |  | if you want to define number of dumps kept in bucket(ex. "10" will keep latest 10).
 `SLACK_ALERTS` | No |  | `true` if you want to send Slack alerts in case of failure.
 `SLACK_WEBHOOK_URL` | No |  | The Incoming WebHook URL to use to send the alerts.

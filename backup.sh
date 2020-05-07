@@ -6,16 +6,17 @@ set -o errtrace
 set -o nounset
 # set -o xtrace
 
+DB_TYPE=${DB_TYPE:-/tmp}
 BACKUP_DIR=${BACKUP_DIR:-/tmp}
 BOTO_CONFIG_PATH=${BOTO_CONFIG_PATH:-/root/.boto}
 GCS_BUCKET=${GCS_BUCKET:-}
 GCS_KEY_FILE_PATH=${GCS_KEY_FILE_PATH:-}
-MONGODB_HOST=${MONGODB_HOST:-localhost}
-MONGODB_PORT=${MONGODB_PORT:-27017}
-MONGODB_DB=${MONGODB_DB:-}
-MONGODB_USER=${MONGODB_USER:-}
-MONGODB_PASSWORD=${MONGODB_PASSWORD:-}
-MONGODB_OPLOG=${MONGODB_OPLOG:-}
+DB_HOST=${DB_HOST:-127.0.0.1}
+DB_PORT=${DB_PORT:-27017}
+DB_NAME=${DB_NAME:-}
+DB_USER=${DB_USER:-}
+DB_PASSWORD=${DB_PASSWORD:-}
+DB_OPLOG=${DB_OPLOG:-}
 RETENTION_COUNT=${RETENTION_COUNT:-}
 SLACK_ALERTS=${SLACK_ALERTS:-}
 SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL:-}
@@ -24,30 +25,49 @@ SLACK_USERNAME=${SLACK_USERNAME:-}
 SLACK_ICON=${SLACK_ICON:-}
 
 backup() {
+  echo "Prepare inputs for backup $DB_TYPE"
+
   mkdir -p $BACKUP_DIR
   date=$(date "+%Y-%m-%dT%H:%M:%SZ")
   archive_name="backup-$date.tar.gz"
 
-  cmd_auth_part=""
-  if [[ ! -z $MONGODB_USER ]] && [[ ! -z $MONGODB_PASSWORD ]]
+  if [[ $DB_TYPE == "MONGODB" ]]
   then
-    cmd_auth_part="--username=\"$MONGODB_USER\" --password=\"$MONGODB_PASSWORD\" --authenticationDatabase=admin"
+
+    cmd_auth_part=""
+    if [[ ! -z $DB_USER ]] && [[ ! -z $DB_PASSWORD ]]
+    then
+      cmd_auth_part="--username=\"$DB_USER\" --password=\"$DB_PASSWORD\" --authenticationDatabase=admin"
+    fi
+
+    cmd_db_part=""
+    if [[ ! -z $DB_NAME ]]
+    then
+      cmd_db_part="--db=\"$DB_NAME\""
+    fi
+
+    cmd_oplog_part=""
+    if [[ $DB_OPLOG = "true" ]]
+    then
+      cmd_oplog_part="--oplog"
+    fi
+
+    echo ""mongodump --host=\"$DB_HOST\" --port=\"$DB_PORT\" $cmd_auth_part $cmd_db_part $cmd_oplog_part --gzip --archive=$BACKUP_DIR/$archive_name""
+    cmd="mongodump --host=\"$DB_HOST\" --port=\"$DB_PORT\" $cmd_auth_part $cmd_db_part $cmd_oplog_part --gzip --archive=$BACKUP_DIR/$archive_name"
+  fi
+  if [[ $DB_TYPE == "MYSQL" ]]
+  then
+    echo "mysqldump -h $DB_HOST -P $DB_PORT -usessl=false -u $DB_USER -p$DB_PASSWORD $DB_NAME | gzip > $BACKUP_DIR/$archive_name"
+    cmd="mysqldump -h $DB_HOST -P $DB_PORT -usessl=false -u $DB_USER -p$DB_PASSWORD $DB_NAME | gzip > $BACKUP_DIR/$archive_name"
   fi
 
-  cmd_db_part=""
-  if [[ ! -z $MONGODB_DB ]]
+  if [[ $DB_TYPE == "POSTGRESQL" ]]
   then
-    cmd_db_part="--db=\"$MONGODB_DB\""
+    echo "pg_dump --host=$DB_HOST --port=$DB_PORT --username=$DB_USER | gzip > $BACKUP_DIR/$archive_name"
+    cmd="pg_dump --host=$DB_HOST --port=$DB_PORT --username=$DB_USER | gzip > $BACKUP_DIR/$archive_name"
   fi
 
-  cmd_oplog_part=""
-  if [[ $MONGODB_OPLOG = "true" ]]
-  then
-    cmd_oplog_part="--oplog"
-  fi
-
-  cmd="mongodump --host=\"$MONGODB_HOST\" --port=\"$MONGODB_PORT\" $cmd_auth_part $cmd_db_part $cmd_oplog_part --gzip --archive=$BACKUP_DIR/$archive_name"
-  echo "starting to backup MongoDB host=$MONGODB_HOST port=$MONGODB_PORT"
+  echo "starting to backup $DB_TYPE host=$DB_HOST port=$DB_PORT"
   eval "$cmd" 2>&1
 }
 

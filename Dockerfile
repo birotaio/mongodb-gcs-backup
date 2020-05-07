@@ -3,6 +3,8 @@ FROM alpine:3.9
 RUN apk add --update \
   bash \
   mongodb-tools \
+  postgresql-client \
+  mysql-client \
   curl \
   python \
   py-pip \
