@@ -57,14 +57,28 @@ backup() {
   fi
   if [[ $DB_TYPE == "MYSQL" ]]
   then
-    echo "mysqldump -h $DB_HOST -P $DB_PORT -usessl=false -u $DB_USER -p$DB_PASSWORD $DB_NAME | gzip > $BACKUP_DIR/$archive_name"
-    cmd="mysqldump -h $DB_HOST -P $DB_PORT -usessl=false -u $DB_USER -p$DB_PASSWORD $DB_NAME | gzip > $BACKUP_DIR/$archive_name"
+
+    cmd_db_part="--all-databases"
+    if [[ ! -z $DB_NAME ]]
+    then
+      cmd_db_part=$DB_NAME
+    fi
+
+    echo "mysqldump -h $DB_HOST -P $DB_PORT -usessl=false -u $DB_USER -p$DB_PASSWORD $cmd_db_part | gzip > $BACKUP_DIR/$archive_name"
+    cmd="mysqldump -h $DB_HOST -P $DB_PORT -usessl=false -u $DB_USER -p$DB_PASSWORD $cmd_db_part | gzip > $BACKUP_DIR/$archive_name"
   fi
 
   if [[ $DB_TYPE == "POSTGRESQL" ]]
   then
-    echo "pg_dump --host=$DB_HOST --port=$DB_PORT --username=$DB_USER | gzip > $BACKUP_DIR/$archive_name"
-    cmd="pg_dump --host=$DB_HOST --port=$DB_PORT --username=$DB_USER | gzip > $BACKUP_DIR/$archive_name"
+
+    cmd_db_part=""
+    if [[ ! -z $DB_NAME ]]
+    then
+      cmd_db_part="--dbname=$DB_NAME"
+    fi
+
+    echo "pg_dump --host=$DB_HOST --port=$DB_PORT --username=$DB_USER $cmd_db_part | gzip > $BACKUP_DIR/$archive_name"
+    cmd="pg_dump --host=$DB_HOST --port=$DB_PORT --username=$DB_USER $cmd_db_part | gzip > $BACKUP_DIR/$archive_name"
   fi
 
   echo "starting to backup $DB_TYPE host=$DB_HOST port=$DB_PORT"
@@ -132,8 +146,8 @@ cleanup() {
   fi
 }
 
-trap err ERR
+#trap err ERR
 backup
-upload_to_gcs
-cleanup
+#upload_to_gcs
+#cleanup
 echo "backup done!"
